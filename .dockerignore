@@ -1,0 +1,47 @@
+.env
+# Node.js
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Logs
+logs
+*.log
+
+# Build artifacts
+dist
+build
+out
+
+# Version control
+.git
+.gitignore
+
+# Docker related
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Testing
+coverage
+.nyc_output
+__tests__
+__mocks__
+
+# Development
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Other
+README.md
+LICENSE
+*.md
+
+nginx

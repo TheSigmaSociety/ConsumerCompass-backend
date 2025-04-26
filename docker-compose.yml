@@ -1,0 +1,52 @@
+services:
+  api:
+    image: ilovecrayons/uwb:latest
+    container_name: express-app
+    expose:
+      - "80"  # Only expose internally
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - PORT=80  # Explicitly set the port to 80
+    restart: unless-stopped
+    networks:
+      - app-network
+    volumes:
+      - ./logs:/app/logs
+    # Add healthcheck to ensure the API is actually running
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/api/"] 
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:1.25
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - api
+    restart: always
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email huangfeiyang2008@gmail.com --agree-tos --no-eff-email --force-renewal -d sigmasociety.dedyn.io 
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h; done;'"
+    restart: always
+  
+
+networks:
+  app-network:
+    driver: bridge
