@@ -29,11 +29,8 @@ router.post('/addProduct', asyncHandler(async (req, res) => {
     const name = productInfo.title || 'Unknown';
     const brand = productInfo.brand || 'Unknown';
     
-    // Extract the raw price from the first vendor if available, or set to null
-    let price = null;
-    if (productInfo.offers && productInfo.offers.length > 0) {
-        price = productInfo.offers[0].price || productInfo.offers[0].list_price || null;
-    }
+    // Use price directly from AI ratings instead of UPC API
+    const price = ratings.rawPrice || null;
     
     // Store in database
     await dbHandler.addProduct(barcode, productInfo, ratings);
@@ -45,7 +42,7 @@ router.post('/addProduct', asyncHandler(async (req, res) => {
             ...ratings,
             name,
             brand,
-            price,
+            price, // Using AI-generated price
             image: imageUrl,
             nutritionGrade: productInfo.metadata?.nutrition_grades,
             novaGroup: productInfo.metadata?.nova_group

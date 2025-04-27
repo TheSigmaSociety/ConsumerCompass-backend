@@ -4,7 +4,9 @@ const { GoogleGenAI } = require("@google/genai");
 const { GOOGLE_API_KEY } = process.env;
 
 const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
-const systemPrompt = `You are given a JSON object containing basic product information extracted from a barcode. Your task is to analyze the product and return a JSON object with three ratings: sustainability score, nutritional value, price value, and an overall holistic rating based on the previous ratings and other factors, such as product quality or brand reputation. 
+const systemPrompt = `You are given a JSON object containing basic product information extracted from a barcode. Your task is to analyze the product and return a JSON object with three ratings: sustainability score, nutritional value, price value, and an overall holistic rating based on the previous ratings and other factors, such as product quality or brand reputation.
+
+Additionally, get the msrp price of the product as well.
 
 **The emphasis for the holistic rating must prioritize sustainability over all other factors**.
 
@@ -44,6 +46,7 @@ When scoring, you must strictly adhere to the following detailed criteria:
 **EXAMPLE OUTPUT (format to strictly follow):**
 
 {
+    "rawPrice": 12.99,
     "sustainabilityScore" : 3,
     "priceValue" : 3,
     "nutritionalValue" : 4,

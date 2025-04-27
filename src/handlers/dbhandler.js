@@ -46,12 +46,8 @@ async function addProduct(barcode, productInfo, ratings) {
             ? productInfo.images[0] 
             : '';
             
-        // Extract the raw price from the first vendor if available
-        let rawPrice = null;
-        if (productInfo.offers && productInfo.offers.length > 0) {
-            // Use the actual price if available, otherwise use list_price
-            rawPrice = productInfo.offers[0].price || productInfo.offers[0].list_price || null;
-        }
+        // Use rawPrice directly from AI ratings response instead of UPC API
+        const rawPrice = ratings.rawPrice || null;
 
         // Try to find existing product
         const existingProduct = await collection.findOne({ barcode });
@@ -69,7 +65,7 @@ async function addProduct(barcode, productInfo, ratings) {
                         mostRecentNutritionalValue: ratings.nutritionalValue,
                         mostRecentHolisticRating: ratings.holisticRating,
                         mostRecentDescription: ratings.description,
-                        rawPrice: rawPrice // Add raw price to existing product
+                        rawPrice: rawPrice // Use AI-provided price
                     },
                     $push: {
                         ratingList: ratingInstance
@@ -84,7 +80,7 @@ async function addProduct(barcode, productInfo, ratings) {
                 name,
                 brand,
                 image,
-                rawPrice, // Add raw price to new product
+                rawPrice, // Use AI-provided price
                 mostRecentPriceValue: ratings.priceValue,
                 mostRecentSustainabilityScore: ratings.sustainabilityScore,
                 mostRecentNutritionalValue: ratings.nutritionalValue,
