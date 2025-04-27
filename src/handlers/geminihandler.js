@@ -33,7 +33,7 @@ When scoring, you must strictly adhere to the following detailed criteria:
 
 4. **holisticRating (1-5)**:
     - Weighted average of the above three ratings, but **sustainabilityScore counts DOUBLE**. 
-    - Formula: \`(2 * sustainabilityScore + nutritionalValue + priceValue) / 4\`, then round to nearest whole number.
+    - Formula: \`(2 * (sustainabilityScore + nutritionalValue + priceValue) ) / 4\`, then round to nearest whole number.
 
 **Additional Output Requirements:**
 
