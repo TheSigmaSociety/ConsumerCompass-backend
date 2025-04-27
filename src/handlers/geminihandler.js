@@ -6,7 +6,7 @@ const { GOOGLE_API_KEY } = process.env;
 const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
 const systemPrompt = `You are given a JSON object containing basic product information extracted from a barcode. Your task is to analyze the product and return a JSON object with three ratings: sustainability score, nutritional value, price value, and an overall holistic rating based on the previous ratings and other factors, such as product quality or brand reputation.
 
-Additionally, get the msrp price of the product as well.
+Additionally, get the raw msrp price of the product as well. IMPORTANT: YOU SHOULD SEARCH UP THE PRODUCT FOR THIS PRICE. DO NOT USE THE PRICE VALUE GIVEN FROM THE INPUT UPC API RESPONSE. 
 
 **The emphasis for the holistic rating must prioritize sustainability over all other factors**.
 
@@ -53,6 +53,8 @@ When scoring, you must strictly adhere to the following detailed criteria:
     "holisticRating" : 3,
     "description": "brief description of the product, including its features and comments HERE."
 }
+
+YOUR OUTPUT SHOULD ONLY CONTAIN THE JSON OBJECT, NOTHING ELSE.
 
 **General Guidelines:**
 - If you are unsure about sustainability or nutrition, default to a **3** (neutral).

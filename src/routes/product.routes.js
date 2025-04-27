@@ -19,23 +19,18 @@ router.post('/addProduct', asyncHandler(async (req, res) => {
         });
     }
     
-    // Get product info and AI-generated ratings
     const { productInfo, ratings } = await geminiHandler.getProductRatings(barcode);
     
-    // Extract relevant product information
     const imageUrl = productInfo.images && productInfo.images.length > 0 
         ? productInfo.images[0] 
         : '';
     const name = productInfo.title || 'Unknown';
     const brand = productInfo.brand || 'Unknown';
     
-    // Use price directly from AI ratings instead of UPC API
     const price = ratings.rawPrice || null;
     
-    // Store in database
     await dbHandler.addProduct(barcode, productInfo, ratings);
     
-    // Return the ratings and additional product information to the client
     res.status(200).json({
         success: true,
         data: {
