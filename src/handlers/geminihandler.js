@@ -71,7 +71,14 @@ async function getProductRatings(barcodeString) {
         };
     } catch (error) {
         console.error("Error in getProductRatings:", error);
-        throw error;
+        // Add more detailed error information
+        if (error.message.includes("No product found for barcode")) {
+            throw new Error(`Product not found: ${error.message}`);
+        } else if (error.message.includes("Error fetching product")) {
+            throw new Error(`API error: ${error.message}`);
+        } else {
+            throw error;
+        }
     }
 }
 

@@ -29,7 +29,7 @@ router.post('/addProduct', asyncHandler(async (req, res) => {
     const name = productInfo.title || 'Unknown';
     const brand = productInfo.brand || 'Unknown';
     
-    // Extract the raw price from the first vendor if available
+    // Extract the raw price from the first vendor if available, or set to null
     let price = null;
     if (productInfo.offers && productInfo.offers.length > 0) {
         price = productInfo.offers[0].price || productInfo.offers[0].list_price || null;
@@ -46,7 +46,9 @@ router.post('/addProduct', asyncHandler(async (req, res) => {
             name,
             brand,
             price,
-            image: imageUrl
+            image: imageUrl,
+            nutritionGrade: productInfo.metadata?.nutrition_grades,
+            novaGroup: productInfo.metadata?.nova_group
         }
     });
 }));
