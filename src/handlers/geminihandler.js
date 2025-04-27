@@ -4,23 +4,44 @@ const { GoogleGenAI } = require("@google/genai");
 const { GOOGLE_API_KEY } = process.env;
 
 const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
-const systemPrompt = `You are given a JSON object containing basic product information extracted from a barcode. Your task is to analyze the product and return a JSON object with three ratings: sustainability score, nutritional value, price value, and overall rating based on the previous ratings and other factors, such as product quality or reputation. The emphasis of this score should be on sustainability (prioritize sustainability). additionally, output a one sentence brief product description and a VERY BEIEF comment on the ratings given previously (with once again, an emphasis on sustainability).
+const systemPrompt = `You are given a JSON object containing basic product information extracted from a barcode. Your task is to analyze the product and return a JSON object with three ratings: sustainability score, nutritional value, price value, and an overall holistic rating based on the previous ratings and other factors, such as product quality or brand reputation. 
 
-Based on the product name and brand, evaluate the following attributes:
+**The emphasis for the holistic rating must prioritize sustainability over all other factors**.
 
-sustainabilityScore (1-5): How environmentally friendly the product is, considering factors like packaging, sourcing, and production methods.
+When scoring, you must strictly adhere to the following detailed criteria:
 
-nutritionalValue (1-5): How healthy the product is for the average consumer.
+1. **sustainabilityScore (1-5)**:
+    - 5 = Product is widely known to be eco-friendly (e.g., organic, minimal packaging, sustainable sourcing).
+    - 4 = Product is moderately eco-friendly (some sustainable practices, partially recyclable packaging).
+    - 3 = Average; unknown or mixed sustainability practices.
+    - 2 = Somewhat unsustainable (excessive packaging, sourcing concerns).
+    - 1 = Very harmful to environment (heavy plastic, unethical sourcing).
 
-priceValue (1-5): How good the product is for the price (a product that is unhealthy and expensive at the same time should be given a very low score, and vice versa).
+2. **nutritionalValue (1-5)**:
+    - 5 = Very healthy (low sugar, high in nutrients, organic).
+    - 4 = Generally healthy (some minor issues like moderate sugar).
+    - 3 = Neutral (average food product, not particularly healthy or unhealthy).
+    - 2 = Somewhat unhealthy (high sugar, processed, few nutrients).
+    - 1 = Very unhealthy (junk food, processed heavily, no nutritional benefit).
 
-holisticRating (1-5): A general rating of the product based the other ratings and other factors such as quality or reputation.
+3. **priceValue (1-5)**:
+    - 5 = Excellent value (high quality relative to price).
+    - 4 = Good value (price appropriate for quality).
+    - 3 = Average value (price is typical for quality).
+    - 2 = Poor value (overpriced for what it offers).
+    - 1 = Very poor value (expensive and low quality).
 
-the additional product description field should just be a brief description of the product, including its features, and comments on the ratings given previously.
+4. **holisticRating (1-5)**:
+    - Weighted average of the above three ratings, but **sustainabilityScore counts DOUBLE**. 
+    - Formula: `(2 * sustainabilityScore + nutritionalValue + priceValue) / 4`, then round to nearest whole number.
 
-Use your general knowledge of the brand and product type to make reasonable judgments.
+**Additional Output Requirements:**
 
-the response should be a JSON object. a sample response is show below. follow the EXACT same format, but with the values filled in based on the product information provided:
+- **description**: 1 brief sentence summarizing the product and mentioning the ratings given, **emphasizing sustainability first**.
+- Always maintain the **EXACT** JSON output structure shown below.
+- Always output numeric values as integers (no decimals).
+
+**EXAMPLE OUTPUT (format to strictly follow):**
 
 {
     "sustainabilityScore" : 3,
@@ -29,6 +50,13 @@ the response should be a JSON object. a sample response is show below. follow th
     "holisticRating" : 3,
     "description": "brief description of the product, including its features and comments HERE."
 }
+
+**General Guidelines:**
+- If you are unsure about sustainability or nutrition, default to a **3** (neutral).
+- Never hallucinate extreme ratings (1 or 5) unless you are confident the product clearly deserves it based on common knowledge.
+- Prefer stability and cautious judgments over speculation.
+
+Now, analyze the given product:
 `;
 
 async function getRatings(upcResponse) {
